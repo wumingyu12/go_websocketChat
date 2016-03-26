@@ -1,0 +1,68 @@
+
+ <html>
+ 	<head>
+ 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ 		<meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>iMessage Admin</title>
+        <!--css-->
+        <link rel="stylesheet" type="text/css" href="js/jquery_mobile/jquery.mobile-1.4.5.css" />
+        <!--js-->
+        <script type="text/javascript" src="js/jquery-2.1.3.min.js" ></script> <!--这个是js/是控制器的一个路由-->
+        <script type="text/javascript" src="js/jquery_mobile/jquery.mobile-1.4.5.js" ></script>
+        <link rel="stylesheet" type="text/css" href="css/960Grid_css/jquery-mobile-fluid960.css" /><!--960插件用来网格布局要放在jqm后-->
+        <!--这是websocket--> 
+ 		<script type="text/javascript"> 
+ 			var sock = null;
+         	var wsuri = "ws://{{.ServerIp}}/ws";
+         	window.onload = function() {//初始化
+				console.log("onload");
+            	try
+            	{
+                	sock = new WebSocket(wsuri);
+            	}catch (e) {
+                	alert(e.Message);
+            	}
+            	sock.onopen = function() {
+               		console.log("connected to " + wsuri);
+            	}
+            	sock.onerror = function(e) {
+               		console.log(" error from connect " + e);
+            	}
+            	sock.onclose = function(e) {
+               		console.log("connection closed (" + e.code + ")");
+            	}
+            	sock.onmessage = function(e) {
+               		console.log("message received: " + e.data);
+               		$('#log').append('<p> server say: '+e.data+'<p>');
+               		$('#log').get(0).scrollTop = $('#log').get(0).scrollHeight;
+            	}
+         	};
+         	function send() {//发送数据
+            	var msg = document.getElementById('message').value;
+            	$('#log').append('<p style="color:red;">I say: '+msg+'<p>');
+                $('#log').get(0).scrollTop = $('#log').get(0).scrollHeight;
+                $('#msg').val('');
+            	sock.send(msg);
+         	};
+ 		</script>
+ 	</head>
+	<body class="ui-mobile-viewport ui-overlay-a" >
+		<div data-role="header" data-theme="a"> 
+			<h1>聊天室</h1> 
+		</div>   
+ 		<div id="log" style="margin: auto auto;height: 300px;width:98%;overflow-y: scroll;border: 1px solid #CCC;">
+        </div>
+
+
+        <div class="container_12" style="margin: auto 10px;" ><!--960gird布局插件,一行总长12-->
+        	<div class="grid_7" style="margin: 4px 0px 0px 10px;"><!--960gird布局插件,一行总长12占2-->
+        		<input id="message" type="text" style="margin: auto auto;" value="Hello, world!">
+        	</div>
+        	<div class="grid_3" style="margin: 4px 0px 0px 10px;"><!--960gird布局插件,一行总长12占2-->
+        		<a onclick="send();" data-role="button" style="margin: 4px 0px 0px 10px;" data-mini="true" data-inline="true">发送信息</a>
+        	</div>
+        </div>
+
+	</body>  
+</html>  
+
